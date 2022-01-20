@@ -1,0 +1,31 @@
+name: GCR Build & Push
+
+on:
+  workflow_dispatch:
+    inputs:
+       project_id:
+         description: 'Name of the customer'
+         required: true
+
+jobs:
+  build-and-push-to-gcr:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: gcr.io/${{github.event.inputs.project_id}}/ui/test
+      PROJECT_ID: ${{github.event.inputs.project_id}}
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+
+      - uses: google-github-actions/setup-gcloud@master
+        name: gcloud steup
+
+      - uses: RafikFarhad/push-to-gcr-github-action@v4
+        name: build & pusch to GCR
+        with:
+          gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_KEY }} #must be encoded in base64
+          registry: gcr.io
+          project_id: ${{ env.PROJECT_ID }}
+          image_name: ${{ env.IMAGE }}
+          image_tag: ${{ github.run_id }} #${{ steps.get_tag_name.outputs.GIT_TAG_NAME}}
+          dockerfile: ./build/Dockerfile
