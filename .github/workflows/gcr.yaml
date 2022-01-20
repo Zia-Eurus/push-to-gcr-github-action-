@@ -11,7 +11,7 @@ jobs:
   build-and-push-to-gcr:
     runs-on: ubuntu-latest
     env:
-      IMAGE: gcr.io/${{github.event.inputs.project_id}}/ui/test
+      IMAGE: ui/test
       PROJECT_ID: ${{github.event.inputs.project_id}}
     steps:
       - uses: actions/checkout@v2
@@ -19,12 +19,6 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@master
         name: gcloud steup
-
-      # - id: 'auth'
-      #   name: Google Auth
-      #   uses: google-github-actions/auth@v0.4.0
-      #   with:
-      #     credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
 
       - uses: RafikFarhad/push-to-gcr-github-action@v4
         name: build & pusch to GCR
