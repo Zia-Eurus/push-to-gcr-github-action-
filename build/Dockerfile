@@ -1,13 +1,7 @@
-FROM docker:19.03.8
-
-LABEL maintainer="RafikFarhad <rafikfarhad@gmail.com>"
-
-RUN apk update && \
-  apk upgrade && \
-  apk add --no-cache python bash
-
-ADD entrypoint.sh /entrypoint.sh
-
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT [ "/entrypoint.sh" ]
+FROM python:3-alpine
+WORKDIR /usr/src/app
+EXPOSE 8000
+COPY requirements.txt .
+RUN pip install -qr requirements.txt
+COPY server.py .
+CMD ["python3", "./server.py"]

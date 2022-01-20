@@ -20,6 +20,12 @@ jobs:
       - uses: google-github-actions/setup-gcloud@master
         name: gcloud steup
 
+      - id: 'auth'
+        name: Google Auth
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
       - uses: RafikFarhad/push-to-gcr-github-action@v4
         name: build & pusch to GCR
         with:
