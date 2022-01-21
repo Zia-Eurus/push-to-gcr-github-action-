@@ -12,7 +12,7 @@ on:
 env:
   GITHUB_SHA: ${{ github.sha }} 
   GITHUB_REF: ${{ github.ref }} 
-  IMAGE: "gcr.io/${{github.event.inputs.project_id}}/ui/test"
+  IMAGE: "ui/test"
   REGISTRY_HOSTNAME: gcr.io
   PROJECT_ID: ${{ github.event.inputs.project_id }}
   PROJECT_NUMBER: ${{ github.event.inputs.project_number }}
@@ -40,13 +40,30 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
 
-      - name: 'Use gcloud CLI'
-        run: 'gcloud info'
-
-      - name: Set tag to the latest image
+      # Configure docker to use the gcloud command-line tool as a credential helper
+      - name: gcloud auth configure-docker
         run: |
-          docker pull ${{env.IMAGE}}
-          docker pull ${{env.IMAGE}}:latest
+          gcloud version
+          gcloud auth configure-docker --quiet
+        # Set up docker to authenticate via gcloud command-line tool
+        
+      # Build the Docker image
+      - name: Build
+        run: |
+          export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+          echo $TAG
+          docker build -t "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" \
+            --build-arg GITHUB_SHA="$GITHUB_SHA" \
+            --build-arg GITHUB_REF="$GITHUB_REF" .
+
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |
+          export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+          echo $TAG
+          docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG"
+          docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+          docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
 
       #     docker tag ${{env.IMAGE}}:latest ${{env.IMAGE}}:${{github.run_id}}
       #     docker push ${{env.IMAGE}}:${{github.run_id}}
