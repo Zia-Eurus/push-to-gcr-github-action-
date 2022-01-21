@@ -4,38 +4,121 @@ on:
   workflow_dispatch:
     inputs:
        project_id:
-         description: 'Name of the customer'
+         description: 'project id'
          required: true
+       project_number:
+         description: 'project number'
+         required: true
+env:
+  GITHUB_SHA: ${{ github.sha }} 
+  GITHUB_REF: ${{ github.ref }} 
+  IMAGE: "gcr.io/${{github.event.inputs.project_id}}/ui/test"
+  REGISTRY_HOSTNAME: gcr.io
+  PROJECT_ID: ${{ github.event.inputs.project_id }}
+  PROJECT_NUMBER: ${{ github.event.inputs.project_number }}
 
 jobs:
-  build-and-push-to-gcr:
+  deploy:
+    name: build
     runs-on: ubuntu-latest
-    env:
-      IMAGE: ui/test
-      PROJECT_ID: ${{github.event.inputs.project_id}}
+
     steps:
-      - uses: actions/checkout@v2
-        name: Checkout
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - uses: google-github-actions/setup-gcloud@master
-        name: gcloud steup
-
-      - uses: RafikFarhad/push-to-gcr-github-action@v4
-        name: build & pusch to GCR
+      - id: auth
+        name: github-workflow-federation
+        uses: 'google-github-actions/auth@v0'
         with:
-          gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_KEY }} #must be encoded in base64
-          registry: gcr.io
-          project_id: ${{ env.PROJECT_ID }}
-          image_name: ${{ env.IMAGE }}
-          image_tag: ${{ github.run_id }} #${{ steps.get_tag_name.outputs.GIT_TAG_NAME}}
-          dockerfile: ./build/Dockerfile
+          workload_identity_provider: 'projects/${{env.project_number}}/locations/global/workloadIdentityPools/my-pool/providers/demo-provider'
+          service_account: 'bucket-create-permission@${{env.PROJECT_ID}}.iam.gserviceaccount.com'
+          # project_id: ${{matrix.project_id}}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+
+      - name: Set tag to the latest image
+        run: |
+          docker pull ${{env.IMAGE}}
+          docker pull ${{env.IMAGE}}:latest
+
+      #     docker tag ${{env.IMAGE}}:latest ${{env.IMAGE}}:${{github.run_id}}
+      #     docker push ${{env.IMAGE}}:${{github.run_id}}
+
+  # setup-build-publish-deploy:
+  #   name: Setup, Build, and Publish
+  #   runs-on: ubuntu-latest
+  #   steps:
+
+  #   - name: Checkout
+  #     uses: actions/checkout@v2
+
+  #   # Setup gcloud CLI
+  #   - uses: google-github-actions/setup-gcloud@v0
+  #     with:
+  #       credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+  #   - name: 'Set up Cloud SDK'
+  #     uses: 'google-github-actions/setup-gcloud@v0'
+
+  #   - name: 'Use gcloud CLI'
+  #     run: 'gcloud info'
+
+  #   # Configure docker to use the gcloud command-line tool as a credential helper
+  #   - run: |
+  #       # Set up docker to authenticate
+  #       # via gcloud command-line tool.
+  #       gcloud auth configure-docker
+
+  #   # Build the Docker image
+  #   - name: Build
+  #     run: |
+  #       export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+  #       echo $TAG
+  #       docker build -t "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" \
+  #         --build-arg GITHUB_SHA="$GITHUB_SHA" \
+  #         --build-arg GITHUB_REF="$GITHUB_REF" .
+
+  #   # Push the Docker image to Google Container Registry
+  #   - name: Publish
+  #     run: |
+  #       export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+  #       echo $TAG
+  #       docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG"
+  #       docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+  #       docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+  
+  # build-and-push-to-gcr:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     # IMAGE: ui/test
+  #     PROJECT_ID: ${{github.event.inputs.project_id}}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       name: Checkout
+
+      # - uses: google-github-actions/setup-gcloud@master
+      #   name: gcloud steup
+
+      # - uses: RafikFarhad/push-to-gcr-github-action@v4
+      #   name: build & pusch to GCR
+      #   with:
+      #     gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_KEY }} #must be encoded in base64
+      #     registry: gcr.io
+      #     project_id: ${{ env.PROJECT_ID }}
+      #     image_name: ${{ env.IMAGE }}
+      #     image_tag: ${{ github.run_id }} #${{ steps.get_tag_name.outputs.GIT_TAG_NAME}}
+      #     dockerfile: ./build/Dockerfile
       
       # - name: Login to GCR
       #   uses: docker/login-action@v1
       #   with:
       #     registry: gcr.io
-      #     username: _json_key
-      #     password: ${{ secrets.GOOGLE_CREDENTIALS }}
+      #     username: _json_key_base64 #_json_key
+      #     password: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
       # - name: Set tag to the latest image
       #   run: |
