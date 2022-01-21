@@ -46,7 +46,7 @@ jobs:
           gcloud version
           gcloud auth configure-docker --quiet
         # Set up docker to authenticate via gcloud command-line tool
-        
+
       # Build the Docker image
       - name: Build
         run: |
@@ -54,7 +54,7 @@ jobs:
           echo $TAG
           docker build -t "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" \
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
-            --build-arg GITHUB_REF="$GITHUB_REF" .
+            --build-arg GITHUB_REF="$GITHUB_REF" ./build/Dockerfile
 
       # Push the Docker image to Google Container Registry
       - name: Publish
