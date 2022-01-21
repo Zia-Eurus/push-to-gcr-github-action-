@@ -12,7 +12,7 @@ on:
 env:
   GITHUB_SHA: ${{ github.sha }} 
   GITHUB_REF: ${{ github.ref }} 
-  IMAGE: "ui/test"
+  IMAGE: "gcr.io/${{ github.event.inputs.project_id }}/ui/test"
   REGISTRY_HOSTNAME: gcr.io
   PROJECT_ID: ${{ github.event.inputs.project_id }}
   PROJECT_NUMBER: ${{ github.event.inputs.project_number }}
@@ -48,22 +48,27 @@ jobs:
         # Set up docker to authenticate via gcloud command-line tool
 
       # Build the Docker image
-      - name: Build
+      - name: Build & Publish
         run: |
           export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
           echo $TAG
-          docker build -t "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" \
-            --build-arg GITHUB_SHA="$GITHUB_SHA" \
-            --build-arg GITHUB_REF="$GITHUB_REF" .
+          docker build -t ${{env.IMAGE}}:${{ github.run_id }} .
+          docker push ${{env.IMAGE}}:${{ github.run_id }}
 
       # Push the Docker image to Google Container Registry
-      - name: Publish
-        run: |
-          export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
-          echo $TAG
-          docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG"
-          docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
-          docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+      # - name: Publish
+      #   run: |
+      #     export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+      #     echo $TAG
+      #     # docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG"
+      #     # docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+      #     # docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+      
+      # - name: Set tag to the latest image
+      #   run: |
+      #     docker pull ${{env.IMAGE}}:latest
+      #     docker tag ${{env.IMAGE}}:latest ${{env.IMAGE}}:${{github.run_id}}
+      #     docker push ${{env.IMAGE}}:${{github.run_id}}
 
       #     docker tag ${{env.IMAGE}}:latest ${{env.IMAGE}}:${{github.run_id}}
       #     docker push ${{env.IMAGE}}:${{github.run_id}}
