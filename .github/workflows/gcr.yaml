@@ -32,7 +32,7 @@ jobs:
         with:
           workload_identity_provider: 'projects/${{env.PROJECT_NUMBER}}/locations/global/workloadIdentityPools/my-pool/providers/demo-provider'
           service_account: '${{env.PROJECT_NUMBER}}-compute@developer.gserviceaccount.com'
-          # project_id: ${{env.PROJECT_ID}}
+          project_id: ${{env.PROJECT_ID}}
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
