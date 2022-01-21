@@ -30,7 +30,7 @@ jobs:
         name: github-workflow-federation
         uses: 'google-github-actions/auth@v0'
         with:
-          workload_identity_provider: 'projects/${{env.project_number}}/locations/global/workloadIdentityPools/my-pool/providers/demo-provider'
+          workload_identity_provider: 'projects/${{env.PROJECT_NUMBER}}/locations/global/workloadIdentityPools/my-pool/providers/demo-provider'
           service_account: 'bucket-create-permission@${{env.PROJECT_ID}}.iam.gserviceaccount.com'
           # project_id: ${{matrix.project_id}}
 
