@@ -51,7 +51,7 @@ jobs:
         id: prepare
         uses: Surgo/docker-smart-tag-action@v1
         with:
-          docker_image: ui/test
+          docker_image: "${{env.IMAGE}}"
           default_branch: ${{ github.event.repository.default_branch }}
 
       # Build the Docker image
@@ -59,8 +59,8 @@ jobs:
         run: |
           export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
           echo $TAG
-          docker build -t ${{env.IMAGE}}:${{ steps.prepare.outputs.tag }} .
-          docker push ${{env.IMAGE}}:${{ steps.prepare.outputs.tag }}
+          docker build -t "${{ steps.prepare.outputs.tag }}" .
+          docker push "${{ steps.prepare.outputs.tag }}"
 
       # Push the Docker image to Google Container Registry
       # - name: Publish
