@@ -31,11 +31,11 @@ jobs:
 
       - id: auth
         name: github-workflow-federation
-        uses: google-github-actions/auth@v0.4.0
+        uses: google-github-actions/auth@v0.4.3
         with:
           workload_identity_provider: 'projects/${{env.PROJECT_NUMBER}}/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
           service_account: '${{env.PROJECT_NUMBER}}-compute@developer.gserviceaccount.com'
-          project_id: ${{env.PROJECT_ID}}
+          # project_id: ${{env.PROJECT_ID}} #v0.4.3
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
