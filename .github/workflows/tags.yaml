@@ -1,7 +1,12 @@
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+       project_id:
+         description: 'project id'
+         required: true
+  # push:
+  #   tags:
+  #     - 'v*'
 jobs:
   test:
     runs-on: ubuntu-latest
