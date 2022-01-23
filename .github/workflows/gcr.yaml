@@ -61,12 +61,16 @@ jobs:
       #     echo $TAG
       #     docker build -t "${{ steps.prepare.outputs.tag }}" .
       #     docker push "${{ steps.prepare.outputs.tag }}"
+      
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
 
       - uses: mr-smithers-excellent/docker-build-push@v5
         name: Build & push Docker image
         with:
           image: ui/test
-          tags: ${{ GITHUB_REF#refs/*/ }}, latest
+          tags: ${{ steps.vars.outputs.tag }}, latest
           registry: "${{ env.REGISTRY_HOSTNAME }}"
           dockerfile: Dockerfile_s4r
 
