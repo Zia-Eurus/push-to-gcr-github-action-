@@ -47,20 +47,28 @@ jobs:
           gcloud auth configure-docker --quiet
         # Set up docker to authenticate via gcloud command-line tool
 
-      - name: Get smart tag
-        id: prepare
-        uses: Surgo/docker-smart-tag-action@v1
-        with:
-          docker_image: "${{env.IMAGE}}"
-          default_branch: ${{ github.event.repository.default_branch }}
+      # - name: Get smart tag
+      #   id: prepare
+      #   uses: Surgo/docker-smart-tag-action@v1
+      #   with:
+      #     docker_image: "${{env.IMAGE}}"
+      #     default_branch: ${{ github.event.repository.default_branch }}
 
       # Build the Docker image
-      - name: Build & Publish
-        run: |
-          export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
-          echo $TAG
-          docker build -t "${{ steps.prepare.outputs.tag }}" .
-          docker push "${{ steps.prepare.outputs.tag }}"
+      # - name: Build & Publish
+      #   run: |
+      #     export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+      #     echo $TAG
+      #     docker build -t "${{ steps.prepare.outputs.tag }}" .
+      #     docker push "${{ steps.prepare.outputs.tag }}"
+
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Build & push Docker image
+        with:
+          image: ui/test
+          tags: ${{ GITHUB_REF#refs/*/ }}, latest
+          registry: "${{ env.REGISTRY_HOSTNAME }}"
+          dockerfile: Dockerfile_s4r
 
       # Push the Docker image to Google Container Registry
       # - name: Publish
