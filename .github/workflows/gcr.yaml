@@ -9,13 +9,16 @@ on:
        project_number:
          description: 'project number'
          required: true
+  push:
+    tags:
+      - 'v*'
 env:
   GITHUB_SHA: ${{ github.sha }} 
   GITHUB_REF: ${{ github.ref }} 
-  IMAGE: "ui/test" #gcr.io/${{ github.event.inputs.project_id }}/
+  IMAGE: "eurus-project-dev/ui/test" #gcr.io/${{ github.event.inputs.project_id }}/
   REGISTRY_HOSTNAME: gcr.io
-  PROJECT_ID: ${{ github.event.inputs.project_id }}
-  PROJECT_NUMBER: ${{ github.event.inputs.project_number }}
+  PROJECT_ID: "eurus-project-dev" #${{ github.event.inputs.project_id }}
+  PROJECT_NUMBER: "103365112501" #${{ github.event.inputs.project_number }}
 
 jobs:
   deploy:
@@ -44,6 +47,10 @@ jobs:
         run: |
           gcloud version
           gcloud auth configure-docker --quiet
+        
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
 
         # Build the Docker image
       - name: Build
@@ -61,9 +68,7 @@ jobs:
           docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"${{github.ref_name}}" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
           docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
       
-      # - name: Set output
-      #   id: vars
-      #   run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
       # - name: Get smart tag
       #   id: prepare
       #   uses: Surgo/docker-smart-tag-action@v1
