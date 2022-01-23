@@ -17,3 +17,4 @@ jobs:
         run: |
           echo $RELEASE_VERSION
           echo ${{ steps.vars.outputs.tag }}
+          echo ${{github.ref_name}}
