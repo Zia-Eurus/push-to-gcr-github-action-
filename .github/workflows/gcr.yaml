@@ -56,19 +56,18 @@ jobs:
       - name: Build
         run: |
           export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
-          echo $TAG
-          docker build -t "$REGISTRY_HOSTNAME"/"$IMAGE":"${{github.ref_name}}" .
+          echo $TAG ${{github.ref_name}}
+          docker build -t "$REGISTRY_HOSTNAME"/"$IMAGE":"${{github.run_id}}" .
 
       #Push the Docker image to Google Container Registry
       - name: Publish
         run: |
           export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
-          echo $TAG
-          docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"${{github.ref_name}}"
-          docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"${{github.ref_name}}" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+          echo $TAG ${{github.ref_name}}
+          docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"${{github.run_id}}"
+          docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"${{github.run_id}}" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
           docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
       
-
       # - name: Get smart tag
       #   id: prepare
       #   uses: Surgo/docker-smart-tag-action@v1
