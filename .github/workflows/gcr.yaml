@@ -63,7 +63,7 @@ jobs:
       - name: Publish
         run: |
           export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
-          echo $TAG ${{github.ref_name}}
+          echo $TAG
           docker push "$REGISTRY_HOSTNAME"/"$PROJECT_ID"/"$IMAGE":"${{github.run_id}}"
           docker tag "$REGISTRY_HOSTNAME"/"$PROJECT_ID"/"$IMAGE":"${{github.run_id}}" "$REGISTRY_HOSTNAME"/"$PROJECT_ID"/"$IMAGE":latest
           docker push "$REGISTRY_HOSTNAME"/"$PROJECT_ID"/"$IMAGE":latest
