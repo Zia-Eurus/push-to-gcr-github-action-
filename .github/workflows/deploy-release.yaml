@@ -36,5 +36,6 @@ jobs:
 
       - name: kubectl Create Resources
         run: |
-          kubectl expose deployment example --port=8765 --target-port=9376 --name=example-service --type=ClusterIP
+          kubectl apply -f manifest/
+          kubectl expose deployment nginx-deployment --port=80 --target-port=80 --name=nginx-service --type=ClusterIP
         #LoadBalancer
