@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v
+        uses: actions/checkout@v2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -32,7 +32,7 @@ jobs:
         with:
           cluster_name: cluster-1
           location: us-central1-c
-          project_id: ${{env.PROJECT_ID}}
+          project_id: ${{ env.PROJECT_ID }}
 
       - name: kubectl Create Resources
         run: |
