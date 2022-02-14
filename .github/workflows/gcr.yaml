@@ -5,10 +5,12 @@ on:
     inputs:
        project_id:
          description: 'project id'
-         required: true
+         required: false
+         default: 'eurus-project-dev'
        project_number:
          description: 'project number'
-         required: true
+         required: false
+         default: '103365112501'
   push:
     tags:
       - 'v*'
