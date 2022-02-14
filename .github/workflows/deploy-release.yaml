@@ -36,6 +36,8 @@ jobs:
 
       - name: kubectl Create Resources
         run: |
-          kubectl apply -f ./manifest/nginx.yaml
+          pwd
+          cd ./manifest
+          kubectl apply -f nginx.yaml
           kubectl expose deployment nginx-deployment --port=80 --target-port=80 --name=nginx-service --type=ClusterIP
         #LoadBalancer
