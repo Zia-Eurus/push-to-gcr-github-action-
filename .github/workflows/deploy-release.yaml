@@ -3,8 +3,8 @@ name: deploy release
 on:
   workflow_dispatch:
 env:
-  PROJECT_ID: "eurus-project-dev" #${{ github.event.inputs.project_id }}
-  PROJECT_NUMBER: "103365112501" #${{ github.event.inputs.project_number }}
+  PROJECT_ID: "eurus-project-dev"
+  PROJECT_NUMBER: "103365112501"
 permissions:
   contents: 'read'
   id-token: 'write'
@@ -24,7 +24,7 @@ jobs:
         with:
           workload_identity_provider: 'projects/${{env.PROJECT_NUMBER}}/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
           service_account: 'bucket-create-permission@${{env.PROJECT_ID}}.iam.gserviceaccount.com'
-          project_id: ${{env.PROJECT_ID}
+          project_id: ${{ env.PROJECT_ID }}
 
       - id: get-gke-credentials
         name: Get GKE Credentials
