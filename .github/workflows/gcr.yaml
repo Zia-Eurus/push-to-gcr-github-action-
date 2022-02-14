@@ -19,7 +19,9 @@ env:
   REGISTRY_HOSTNAME: gcr.io
   PROJECT_ID: "eurus-project-dev" #${{ github.event.inputs.project_id }}
   PROJECT_NUMBER: "103365112501" #${{ github.event.inputs.project_number }}
-
+permissions:
+  contents: 'read'
+  id-token: 'write'
 jobs:
   build:
     runs-on: ubuntu-latest
