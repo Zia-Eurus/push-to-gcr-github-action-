@@ -11,6 +11,9 @@ permissions:
 jobs:
   deploy-release:
     runs-on: ubuntu-latest
+    env:
+      ENV : "LOWEr"
+      CUSTOMER : "zia"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,17 +28,20 @@ jobs:
           workload_identity_provider: 'projects/${{env.PROJECT_NUMBER}}/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
           service_account: 'bucket-create-permission@${{env.PROJECT_ID}}.iam.gserviceaccount.com'
           project_id: ${{ env.PROJECT_ID }}
+          
+      - name: 'Use gcloud CLI'
+        run: 'gcloud alpha storage rm -r gs://zia-test-bucket/cloudflare-dns/customers/${CUSTOMER}-${ENV,,}-dns'
 
-      - id: get-gke-credentials
-        name: Get GKE Credentials
-        uses: google-github-actions/get-gke-credentials@v0.4.0
-        with:
-          cluster_name: cluster-1
-          location: us-central1-c
-          project_id: ${{ env.PROJECT_ID }}
+#       - id: get-gke-credentials
+#         name: Get GKE Credentials
+#         uses: google-github-actions/get-gke-credentials@v0.4.0
+#         with:
+#           cluster_name: cluster-1
+#           location: us-central1-c
+#           project_id: ${{ env.PROJECT_ID }}
 
-      - name: kubectl Create Resources
-        run: |
-          # kubectl create deployment nginx-deployment --image=nginx
-          kubectl expose deployment nginx-deployment --port=80 --target-port=80 --name=nginx-service --type=LoadBalancer
-        #ClusterIP
+#       - name: kubectl Create Resources
+#         run: |
+#           # kubectl create deployment nginx-deployment --image=nginx
+#           kubectl expose deployment nginx-deployment --port=80 --target-port=80 --name=nginx-service --type=LoadBalancer
+#         #ClusterIP
