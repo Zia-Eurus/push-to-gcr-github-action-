@@ -29,6 +29,11 @@ jobs:
           service_account: 'bucket-create-permission@${{env.PROJECT_ID}}.iam.gserviceaccount.com'
           project_id: ${{ env.PROJECT_ID }}
           
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+        with:
+          project_id: "eurus-project-dev"
+          
       - name: 'Use gcloud CLI'
         run: 'gcloud alpha storage rm -r gs://zia-test-bucket/cloudflare-dns/customers/${CUSTOMER}-${ENV,,}-dns'
 
